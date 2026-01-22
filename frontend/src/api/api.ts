@@ -15,7 +15,7 @@ import type {
   ClosedTasksReport,
 } from "../types";
 
-const BASE_API_URL = "http://localhost:3000/api/v1";
+const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
 const api = axios.create({
   baseURL: BASE_API_URL,
