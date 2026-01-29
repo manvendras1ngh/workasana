@@ -79,6 +79,71 @@ export const getTask = asyncWrapper(async (req, res) => {
   return res.status(200).json({ message: "Task list", data: task });
 });
 
+export const getTaskById = asyncWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) return res.status(400).json({ error: "Task ID is required" });
+
+  const task = await Task.findById(id)
+    .populate("project", "name description")
+    .populate("team", "name description")
+    .populate("owners", "name username email")
+    .lean();
+
+  if (!task) return res.status(404).json({ error: "Task not found" });
+
+  return res.status(200).json({ data: task });
+});
+
+export const getTasksByProject = asyncWrapper(async (req, res) => {
+  const { projectId } = req.params;
+
+  if (!projectId)
+    return res.status(400).json({ error: "Project ID is required" });
+
+  const tasks = await Task.find({ project: projectId })
+    .populate("owners", "name username email")
+    .lean();
+
+  return res.status(200).json({ data: tasks });
+});
+
+export const getTasksByTeam = asyncWrapper(async (req, res) => {
+  const { teamId } = req.params;
+
+  if (!teamId) return res.status(400).json({ error: "Team ID is required" });
+
+  const tasks = await Task.find({ team: teamId })
+    .populate("owners", "name username email")
+    .populate("project", "name description")
+    .lean();
+
+  return res.status(200).json({ data: tasks });
+});
+
+export const updateTaskStatus = asyncWrapper(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!id) return res.status(400).json({ error: "Task ID is required" });
+  if (!status) return res.status(400).json({ error: "Status is required" });
+
+  const validStatuses = ["To Do", "In Progress", "Completed", "Blocked"];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: "Invalid status value" });
+  }
+
+  const updatedTask = await Task.findByIdAndUpdate(
+    id,
+    { status },
+    { new: true },
+  ).lean();
+
+  if (!updatedTask) return res.status(404).json({ error: "Task not found" });
+
+  return res.status(200).json({ message: "Task updated", data: updatedTask });
+});
+
 export const udpateTask = asyncWrapper(async (req, res) => {
   const { id, name, team, owners, timeToComplete, status, tags } = req.body;
   if (!id) return res.status(400).json({ message: "Id is required" });
