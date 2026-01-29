@@ -75,6 +75,15 @@ export const useProjectTasks = (projectId: string) => {
   });
 };
 
+export const useTeamTasks = (teamId: string) => {
+  return useQuery({
+    queryKey: ["tasks", "team", teamId],
+    queryFn: () => taskApi.getByTeam(teamId),
+    enabled: !!teamId,
+    retry: false,
+  });
+};
+
 export const useCreateTask = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -104,12 +113,33 @@ export const useTeams = () => {
   });
 };
 
+export const useTeam = (teamId: string) => {
+  return useQuery({
+    queryKey: ["teams", teamId],
+    queryFn: () => teamApi.getById(teamId),
+    enabled: !!teamId,
+    retry: false,
+  });
+};
+
 export const useCreateTeam = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateTeamInput) => teamApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teams"] });
+    },
+  });
+};
+
+export const useAddMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, userId }: { teamId: string; userId: string }) =>
+      teamApi.addMember(teamId, userId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["teams"] });
+      queryClient.invalidateQueries({ queryKey: ["teams", variables.teamId] });
     },
   });
 };

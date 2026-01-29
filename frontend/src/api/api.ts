@@ -107,6 +107,11 @@ export const taskApi = {
     return res.data.data;
   },
 
+  getByTeam: async (teamId: string): Promise<Task[]> => {
+    const res = await api.get(`/tasks/team/${teamId}`);
+    return res.data.data;
+  },
+
   create: async (data: CreateTaskInput): Promise<Task> => {
     const res = await api.post("/tasks", data);
     return res.data.data;
@@ -124,8 +129,18 @@ export const teamApi = {
     return res.data.data;
   },
 
+  getById: async (id: string): Promise<Team> => {
+    const res = await api.get(`/teams/${id}`);
+    return res.data.data;
+  },
+
   create: async (data: CreateTeamInput): Promise<Team> => {
     const res = await api.post("/teams", data);
+    return res.data.data;
+  },
+
+  addMember: async (teamId: string, userId: string): Promise<Team> => {
+    const res = await api.post(`/teams/${teamId}/members`, { userId });
     return res.data.data;
   },
 };

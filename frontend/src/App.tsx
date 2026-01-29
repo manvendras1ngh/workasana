@@ -8,6 +8,7 @@ import { Dashboard } from "./components/dashboard/Dashboard";
 import { TaskList } from "./components/tasks/TaskList";
 import { TaskDetailPage } from "./components/tasks/TaskDetailPage";
 import { TeamPage } from "./components/team/TeamPage";
+import { TeamDetailPage } from "./components/team/TeamDetailPage";
 import { ProjectsPage } from "./components/projects/ProjectsPage";
 import { ProjectDetailPage } from "./components/projects/ProjectDetailPage";
 import { ReportsPage } from "./components/reports/ReportsPage";
@@ -33,6 +34,7 @@ function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
           <Route path="/team" element={<TeamPage />} />
+          <Route path="/team/:teamId" element={<TeamDetailPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>

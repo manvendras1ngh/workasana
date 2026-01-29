@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal } from "../ui/Modal";
-import { useCreateTeam } from "../../hooks/useQueries";
+import { MultiSelect } from "../ui/MultiSelect";
+import { useCreateTeam, useUsers } from "../../hooks/useQueries";
 import toast from "react-hot-toast";
 import axios from "axios";
 
@@ -12,22 +13,25 @@ interface NewTeamModalProps {
 export const NewTeamModal = ({ isOpen, onClose }: NewTeamModalProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const createTeam = useCreateTeam();
+  const { data: users } = useUsers();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !description.trim()) {
-      toast.error("All fields are required");
+      toast.error("Name and description are required");
       return;
     }
 
     createTeam.mutate(
-      { name, description },
+      { name, description, members: selectedMembers },
       {
         onSuccess: () => {
           toast.success("Team created!");
           setName("");
           setDescription("");
+          setSelectedMembers([]);
           onClose();
         },
         onError: (error) => {
@@ -68,6 +72,21 @@ export const NewTeamModal = ({ isOpen, onClose }: NewTeamModalProps) => {
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter team description"
+          />
+        </div>
+        <div>
+          <MultiSelect
+            id="team-members"
+            label="Team Members (Optional)"
+            placeholder="Select team members..."
+            options={
+              users?.map((user) => ({
+                value: user._id,
+                label: user.name,
+              })) || []
+            }
+            selected={selectedMembers}
+            onChange={setSelectedMembers}
           />
         </div>
         <div className="flex justify-end gap-3 pt-2">
