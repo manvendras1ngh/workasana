@@ -1,8 +1,16 @@
 import { useState } from "react";
-import { Modal } from "../ui/Modal";
 import { useCreateProject } from "../../hooks/useQueries";
 import toast from "react-hot-toast";
 import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 interface NewProjectModalProps {
   isOpen: boolean;
@@ -37,56 +45,49 @@ export const NewProjectModal = ({ isOpen, onClose }: NewProjectModalProps) => {
             toast.error("Failed to create project");
           }
         },
-      }
+      },
     );
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="New Project">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="project-name" className="block text-sm font-medium text-gray-700 mb-1">
-            Project Name
-          </label>
-          <input
-            id="project-name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter project name"
-          />
-        </div>
-        <div>
-          <label htmlFor="project-desc" className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            id="project-desc"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter project description"
-          />
-        </div>
-        <div className="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={createProject.isPending}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-          >
-            {createProject.isPending ? "Creating..." : "Create Project"}
-          </button>
-        </div>
-      </form>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>New Project</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="project-name">Project Name</Label>
+            <input
+              id="project-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              placeholder="Enter project name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="project-desc">Description</Label>
+            <textarea
+              id="project-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              placeholder="Enter project description"
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createProject.isPending}>
+              {createProject.isPending ? "Creating..." : "Create Project"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

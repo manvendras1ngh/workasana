@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import type { Team } from "../../types";
-import { Card } from "../ui/Card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 
 interface TeamCardProps {
   team: Team;
@@ -26,51 +28,43 @@ export const TeamCard = ({ team }: TeamCardProps) => {
   };
 
   const members = team.members || [];
-  const displayedMembers = members.slice(0, 3);
-  const remainingCount = members.length - 3;
 
   return (
     <Card
-      className="min-w-[280px] hover:shadow-md transition-shadow cursor-pointer"
+      className="min-w-[280px] hover:shadow-md transition-shadow cursor-pointer p-4"
       onClick={() => navigate(`/team/${team._id}`)}
     >
-      <div className="mb-2">
-        <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-          Team
-        </span>
-      </div>
-      <h3 className="font-semibold text-gray-900 mb-2">{team.name}</h3>
-      <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-        {team.description}
-      </p>
-
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center">
-          <div className="flex -space-x-2">
-            {displayedMembers.map((member) => (
-              <div
-                key={member._id}
-                className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-medium border-2 border-white"
-                title={member.name}
-              >
-                {getInitials(member.name)}
-              </div>
-            ))}
-            {remainingCount > 0 && (
-              <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs font-medium border-2 border-white">
-                +{remainingCount}
-              </div>
-            )}
-          </div>
-          <span className="ml-3 text-sm text-gray-600">
-            {members.length} {members.length === 1 ? "member" : "members"}
-          </span>
+      <CardContent className="p-0 space-y-3">
+        <div>
+          <Badge variant="secondary" className="mb-2">
+            Team
+          </Badge>
+          <CardTitle className="text-base mb-1">{team.name}</CardTitle>
+          <CardDescription className="line-clamp-2">{team.description}</CardDescription>
         </div>
-      </div>
 
-      <div className="text-xs text-gray-400">
-        Created {formatDate(team.createdAt)}
-      </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AvatarGroup>
+              {members.slice(0, 3).map((member) => (
+                <Avatar key={member._id} title={member.name}>
+                  <AvatarFallback className="bg-indigo-500 text-white">
+                    {getInitials(member.name)}
+                  </AvatarFallback>
+                </Avatar>
+              ))}
+              {members.length > 3 && (
+                <AvatarGroupCount>+{members.length - 3}</AvatarGroupCount>
+              )}
+            </AvatarGroup>
+            <span className="text-sm text-muted-foreground">
+              {members.length} {members.length === 1 ? "member" : "members"}
+            </span>
+          </div>
+        </div>
+
+        <div className="text-xs text-muted-foreground">Created {formatDate(team.createdAt)}</div>
+      </CardContent>
     </Card>
   );
 };

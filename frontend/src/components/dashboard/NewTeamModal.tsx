@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { Modal } from "../ui/Modal";
-import { MultiSelect } from "../ui/MultiSelect";
 import { useCreateTeam, useUsers } from "../../hooks/useQueries";
 import toast from "react-hot-toast";
 import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 interface NewTeamModalProps {
   isOpen: boolean;
@@ -51,66 +59,59 @@ export const NewTeamModal = ({ isOpen, onClose }: NewTeamModalProps) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="New Team">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="team-name" className="block text-sm font-medium text-gray-700 mb-1">
-            Team Name
-          </label>
-          <input
-            id="team-name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter team name"
-          />
-        </div>
-        <div>
-          <label htmlFor="team-desc" className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            id="team-desc"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter team description"
-          />
-        </div>
-        <div>
-          <MultiSelect
-            id="team-members"
-            label="Team Members"
-            placeholder="Select team members..."
-            options={
-              users?.map((user) => ({
-                value: user._id,
-                label: user.name,
-              })) || []
-            }
-            selected={selectedMembers}
-            onChange={setSelectedMembers}
-          />
-        </div>
-        <div className="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={createTeam.isPending}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-          >
-            {createTeam.isPending ? "Creating..." : "Create Team"}
-          </button>
-        </div>
-      </form>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>New Team</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="team-name">Team Name</Label>
+            <input
+              id="team-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              placeholder="Enter team name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="team-desc">Description</Label>
+            <textarea
+              id="team-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              placeholder="Enter team description"
+            />
+          </div>
+          <div>
+            <MultiSelect
+              id="team-members"
+              label="Team Members"
+              placeholder="Select team members..."
+              options={
+                users?.map((user) => ({
+                  value: user._id,
+                  label: user.name,
+                })) || []
+              }
+              selected={selectedMembers}
+              onChange={setSelectedMembers}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createTeam.isPending}>
+              {createTeam.isPending ? "Creating..." : "Create Team"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
