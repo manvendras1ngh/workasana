@@ -10,6 +10,18 @@ export const getProjects = asyncWrapper(async (req, res) => {
   return res.status(200).json({ message: "All projects", data: projects });
 });
 
+export const getProjectById = asyncWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) return res.status(400).json({ error: "Project ID is required" });
+
+  const project = await Project.findById(id).lean();
+
+  if (!project) return res.status(404).json({ error: "Project not found" });
+
+  return res.status(200).json({ data: project });
+});
+
 export const addProject = asyncWrapper(async (req, res) => {
   const { name, description } = req.body;
 
