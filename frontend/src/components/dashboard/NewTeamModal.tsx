@@ -24,6 +24,11 @@ export const NewTeamModal = ({ isOpen, onClose }: NewTeamModalProps) => {
       return;
     }
 
+    if (selectedMembers.length === 0) {
+      toast.error("Please select at least one team member");
+      return;
+    }
+
     createTeam.mutate(
       { name, description, members: selectedMembers },
       {
@@ -77,7 +82,7 @@ export const NewTeamModal = ({ isOpen, onClose }: NewTeamModalProps) => {
         <div>
           <MultiSelect
             id="team-members"
-            label="Team Members (Optional)"
+            label="Team Members"
             placeholder="Select team members..."
             options={
               users?.map((user) => ({
