@@ -73,7 +73,11 @@ export const getTask = asyncWrapper(async (req, res) => {
     }
   }
 
-  const task = await Task.find(query).lean();
+  const task = await Task.find(query)
+    .populate("project", "name description")
+    .populate("team", "name description members")
+    .populate("owners", "name username email")
+    .lean();
   if (!task.length) return res.status(400).json({ error: "No task found" });
 
   return res.status(200).json({ message: "Task list", data: task });
@@ -144,26 +148,50 @@ export const updateTaskStatus = asyncWrapper(async (req, res) => {
   return res.status(200).json({ message: "Task updated", data: updatedTask });
 });
 
-export const udpateTask = asyncWrapper(async (req, res) => {
-  const { id, name, team, owners, timeToComplete, status, tags } = req.body;
-  if (!id) return res.status(400).json({ message: "Id is required" });
+export const updateTask = asyncWrapper(async (req, res) => {
+  const { id } = req.params;
+  const { name, project, team, owners, timeToComplete, status, tags } =
+    req.body;
 
-  if (
-    !name ||
-    !team ||
-    !owners.length ||
-    !timeToComplete ||
-    !tags.length ||
-    !status
-  ) {
-    return res
-      .status(400)
-      .json({ message: "Missing required fields for update" });
+  if (!id) return res.status(400).json({ message: "Task ID is required" });
+
+  // build update object with only provided fields
+  const updateData = {};
+  if (name !== undefined) updateData.name = name;
+  if (project !== undefined) updateData.project = project;
+  if (team !== undefined) updateData.team = team;
+  if (owners !== undefined) {
+    if (!Array.isArray(owners) || owners.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Owners must be a non-empty array" });
+    }
+    updateData.owners = owners;
   }
+  if (timeToComplete !== undefined) updateData.timeToComplete = timeToComplete;
+  if (status !== undefined) {
+    const validStatuses = ["To Do", "In Progress", "Completed", "Blocked"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status value" });
+    }
+    updateData.status = status;
+  }
+  if (tags !== undefined) updateData.tags = tags;
 
-  //logic for updating task, update name, team, owners, timetocomplete and status only.
-  //what and how it should be updated
-  //do i need the og values to fill and update or just the values that i need to update
+  const updatedTask = await Task.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  })
+    .populate("project", "name description")
+    .populate("team", "name description")
+    .populate("owners", "name username email")
+    .lean();
+
+  if (!updatedTask) return res.status(404).json({ error: "Task not found" });
+
+  return res
+    .status(200)
+    .json({ message: "Task updated successfully", data: updatedTask });
 });
 
 export const deleteTask = asyncWrapper(async (req, res) => {

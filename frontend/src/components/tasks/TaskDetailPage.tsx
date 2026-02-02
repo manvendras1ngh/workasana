@@ -1,13 +1,16 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTask, useUpdateTaskStatus } from "../../hooks/useQueries";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Card } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import type { Project, Team, User } from "../../types";
+import { EditTaskModal } from "../dashboard/EditTaskModal";
 
 export const TaskDetailPage = () => {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const { data: task, isLoading } = useTask(taskId || "");
   const updateStatus = useUpdateTaskStatus();
@@ -106,15 +109,23 @@ export const TaskDetailPage = () => {
             </span>
           </div>
         </div>
-        {!isCompleted && (
+        <div className="flex gap-2">
           <button
-            onClick={handleMarkComplete}
-            disabled={updateStatus.isPending}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm disabled:opacity-50"
+            onClick={() => setIsEditModalOpen(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm"
           >
-            {updateStatus.isPending ? "Updating..." : "Mark as Complete"}
+            Edit Task
           </button>
-        )}
+          {!isCompleted && (
+            <button
+              onClick={handleMarkComplete}
+              disabled={updateStatus.isPending}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm disabled:opacity-50"
+            >
+              {updateStatus.isPending ? "Updating..." : "Mark as Complete"}
+            </button>
+          )}
+        </div>
       </div>
 
       <Card className="max-w-3xl p-6">
@@ -164,6 +175,15 @@ export const TaskDetailPage = () => {
           </div>
         </div>
       </Card>
+
+      {/* Edit Task Modal */}
+      {task && (
+        <EditTaskModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          task={task}
+        />
+      )}
     </div>
   );
 };

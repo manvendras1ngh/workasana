@@ -105,6 +105,17 @@ export const useUpdateTaskStatus = () => {
   });
 };
 
+export const useUpdateTask = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ taskId, data }: { taskId: string; data: Partial<CreateTaskInput> }) =>
+      taskApi.update(taskId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+};
+
 export const useTeams = () => {
   return useQuery({
     queryKey: ["teams"],

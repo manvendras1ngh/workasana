@@ -7,6 +7,7 @@ import {
   getTasksByProject,
   getTasksByTeam,
   updateTaskStatus,
+  updateTask,
 } from "../controllers/task.controllers.js";
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get("/team/:teamId", getTasksByTeam);
 router.get("/:id", getTaskById);
 router.post("/", createTask);
 router.patch("/:id/status", updateTaskStatus);
+router.patch("/:id", updateTask);
 
 export default router;

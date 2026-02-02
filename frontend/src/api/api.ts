@@ -121,6 +121,11 @@ export const taskApi = {
     const res = await api.patch(`/tasks/${id}/status`, { status });
     return res.data.data;
   },
+
+  update: async (id: string, data: Partial<CreateTaskInput>): Promise<Task> => {
+    const res = await api.patch(`/tasks/${id}`, data);
+    return res.data.data;
+  },
 };
 
 export const teamApi = {
