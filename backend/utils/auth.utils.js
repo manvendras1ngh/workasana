@@ -2,15 +2,14 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const saltRounds = 12;
-const secret = process.env.SECRET_KEY;
-const tokenExpiryTime = "1h";
+const tokenExpiryTime = "1d";
 
 export const generateHashedPassword = async (password) => {
   try {
     const hash = await bcrypt.hash(password, saltRounds);
     return hash;
   } catch (error) {
-    throw new Error(err);
+    throw new Error(error);
   }
 };
 
@@ -24,6 +23,7 @@ export const comparePasswordWithHash = async (password, hash) => {
 };
 
 export const generateBarerToken = (id, username) => {
+  const secret = process.env.SECRET_KEY;
   if (!secret) throw new Error("Missing JWT secret");
 
   const token = jwt.sign({ sub: id, username: username }, secret, {

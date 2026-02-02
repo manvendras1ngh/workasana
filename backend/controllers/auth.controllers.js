@@ -6,6 +6,17 @@ import {
   generateBarerToken,
 } from "../utils/auth.utils.js";
 
+export const getUser = asyncWrapper(async (req, res) => {
+  const { sub: id, username } = req.user;
+
+  if (!id) return res.status(400).json({ error: "Not authenticated!" });
+
+  const user = await User.findById(id).select("-password");
+  if (!user) return res.status(400).json({ error: "User not found!" });
+
+  return res.status(200).json({ data: user });
+});
+
 export const userSignup = asyncWrapper(async (req, res) => {
   const { name, username, email, password } = req.body;
   if (!name || !username || !email || !password)
@@ -61,5 +72,15 @@ export const userLogin = asyncWrapper(async (req, res) => {
 
   const bearerToken = generateBarerToken(user._id, user.username);
 
-  return res.status(200).json({ token: bearerToken });
+  res.cookie("access_token", bearerToken, {
+    httpOnly: true,
+  });
+  return res.status(200).json({
+    data: { name: user.name, username: user.username, email: user.email },
+  });
+});
+
+export const userLogout = asyncWrapper((req, res) => {
+  res.clearCookie("access_token", { httpOnly: true });
+  return res.status(200).json({ message: "Logged out!" });
 });
