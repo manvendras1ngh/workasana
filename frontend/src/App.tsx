@@ -3,6 +3,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import { Toaster } from "react-hot-toast";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PublicRoute } from "./components/PublicRoute";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { Dashboard } from "./components/dashboard/Dashboard";
 import { TaskList } from "./components/tasks/TaskList";
@@ -19,8 +20,22 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
         <Route
           element={
             <ProtectedRoute>
