@@ -46,6 +46,15 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tags", tagRoutes);
 app.use("/api/v1/report", reportRoutes);
 
+// error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Error:", err.message);
+  res.status(500).json({
+    message: err.message || "Internal Server Error",
+    error: process.env.NODE_ENV === "production" ? {} : err,
+  });
+});
+
 // Only start server when not in serverless environment
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {

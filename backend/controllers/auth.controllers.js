@@ -5,6 +5,7 @@ import {
   comparePasswordWithHash,
   generateBarerToken,
 } from "../utils/auth.utils.js";
+const isProduction = process.env.NODE_ENV === "production";
 
 export const getUser = asyncWrapper(async (req, res) => {
   const { sub: id, username } = req.user;
@@ -74,6 +75,9 @@ export const userLogin = asyncWrapper(async (req, res) => {
 
   res.cookie("access_token", bearerToken, {
     httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
   });
   return res.status(200).json({
     data: { name: user.name, username: user.username, email: user.email },
@@ -81,6 +85,10 @@ export const userLogin = asyncWrapper(async (req, res) => {
 });
 
 export const userLogout = asyncWrapper((req, res) => {
-  res.clearCookie("access_token", { httpOnly: true });
+  res.clearCookie("access_token", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  });
   return res.status(200).json({ message: "Logged out!" });
 });
