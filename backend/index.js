@@ -20,11 +20,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 //db connection
-try {
-  instantiateConnection();
-} catch (error) {
-  throw error;
-}
+instantiateConnection().catch((error) => {
+  console.error("Failed to connect to database:", error);
+});
 
 //server settings
 app.use(express.json({ limit: "16kb" }));
@@ -48,8 +46,11 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tags", tagRoutes);
 app.use("/api/v1/report", reportRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port: http://localhost:${PORT}`);
-});
+// Only start server when not in serverless environment
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on port: http://localhost:${PORT}`);
+  });
+}
 
 export default app;
