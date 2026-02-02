@@ -8,7 +8,6 @@ export const instantiateConnection = async () => {
     console.log("Using cached database connection");
     return cachedConnection;
   }
-
   try {
     // Configure mongoose for serverless environment
     mongoose.set("strictQuery", false);
