@@ -1,5 +1,5 @@
 import asyncWrapper from "../utils/asyncWrapper.js";
-import { User } from "../models/User.models.js";
+import { User } from "../models/user.models.js";
 
 export const getUsers = asyncWrapper(async (req, res) => {
   const users = await User.find().select("-password").lean();

@@ -1,7 +1,7 @@
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { Task } from "../models/task.models.js";
 import { Team } from "../models/team.models.js";
-import { User } from "../models/User.models.js";
+import { User } from "../models/user.models.js";
 import { Project } from "../models/project.models.js";
 
 export const getLastWeekCompleted = asyncWrapper(async (req, res) => {
