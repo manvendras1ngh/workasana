@@ -1,8 +1,14 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTeam, useUsers, useAddMember, useTeamTasks, useTags } from "../../hooks/useQueries";
-import { Card } from "../ui/Card";
-import { StatusBadge } from "../ui/StatusBadge";
+import {
+  useTeam,
+  useUsers,
+  useAddMember,
+  useTeamTasks,
+  useTags,
+} from "../../hooks/useQueries";
+import { Card } from "@/components/ui/card";
+import { StatusBadge } from "@/components/ui/status-badge";
 import toast from "react-hot-toast";
 import type { User, Task } from "../../types";
 
@@ -50,7 +56,9 @@ export const TeamDetailPage = () => {
       result = result.filter((task) => {
         const owners = task.owners as User[];
         return owners.some((owner) =>
-          typeof owner === "string" ? owner === ownerFilter : owner._id === ownerFilter
+          typeof owner === "string"
+            ? owner === ownerFilter
+            : owner._id === ownerFilter,
         );
       });
     }
@@ -66,7 +74,12 @@ export const TeamDetailPage = () => {
         return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
       }
       if (sortField === "priority") {
-        const priorityOrder = { Blocked: 0, "In Progress": 1, "To Do": 2, Completed: 3 };
+        const priorityOrder = {
+          Blocked: 0,
+          "In Progress": 1,
+          "To Do": 2,
+          Completed: 3,
+        };
         const aVal = priorityOrder[a.status] ?? 4;
         const bVal = priorityOrder[b.status] ?? 4;
         return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
@@ -90,7 +103,7 @@ export const TeamDetailPage = () => {
 
   const handleAddMember = async (userId: string) => {
     if (!teamId) return;
-    
+
     try {
       await addMember.mutateAsync({ teamId, userId });
       toast.success("Member added successfully!");
@@ -103,7 +116,7 @@ export const TeamDetailPage = () => {
 
   // Get users who are not already members
   const availableUsers = users?.filter(
-    (user) => !team?.members?.some((member) => member._id === user._id)
+    (user) => !team?.members?.some((member) => member._id === user._id),
   );
 
   if (isLoading) {
@@ -145,10 +158,8 @@ export const TeamDetailPage = () => {
 
       {/* Members Section */}
       <Card className="p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Members
-          </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">Members</h2>
           <button
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm flex items-center gap-1"
@@ -158,13 +169,15 @@ export const TeamDetailPage = () => {
         </div>
 
         {!team.members || team.members.length === 0 ? (
-          <p className="text-gray-500">No members yet. Add your first team member!</p>
+          <p className="text-gray-500">
+            No members yet. Add your first team member!
+          </p>
         ) : (
           <div className="space-y-3">
             {team.members.map((member) => (
               <div
                 key={member._id}
-                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                className="flex items-center gap-3 bg-gray-50 rounded-lg"
               >
                 <div className="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-medium">
                   {getInitials(member.name)}
@@ -218,7 +231,11 @@ export const TeamDetailPage = () => {
             <button
               onClick={() => {
                 setSortField("dueDate");
-                setSortOrder(sortField === "dueDate" && sortOrder === "asc" ? "desc" : "asc");
+                setSortOrder(
+                  sortField === "dueDate" && sortOrder === "asc"
+                    ? "desc"
+                    : "asc",
+                );
               }}
               className={`px-3 py-2 rounded-lg text-sm ${
                 sortField === "dueDate"
@@ -226,12 +243,17 @@ export const TeamDetailPage = () => {
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              Due Date {sortField === "dueDate" && (sortOrder === "asc" ? "↑" : "↓")}
+              Due Date{" "}
+              {sortField === "dueDate" && (sortOrder === "asc" ? "↑" : "↓")}
             </button>
             <button
               onClick={() => {
                 setSortField("priority");
-                setSortOrder(sortField === "priority" && sortOrder === "asc" ? "desc" : "asc");
+                setSortOrder(
+                  sortField === "priority" && sortOrder === "asc"
+                    ? "desc"
+                    : "asc",
+                );
               }}
               className={`px-3 py-2 rounded-lg text-sm ${
                 sortField === "priority"
@@ -239,7 +261,8 @@ export const TeamDetailPage = () => {
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              Priority {sortField === "priority" && (sortOrder === "asc" ? "↑" : "↓")}
+              Priority{" "}
+              {sortField === "priority" && (sortOrder === "asc" ? "↑" : "↓")}
             </button>
           </div>
         </div>
@@ -251,11 +274,21 @@ export const TeamDetailPage = () => {
             <table className="w-full bg-white border border-gray-200 rounded-lg">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Task Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Owner</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Due Date</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Tags</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Task Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Owner
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Due Date
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Tags
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -265,13 +298,21 @@ export const TeamDetailPage = () => {
                     onClick={() => navigate(`/tasks/${task._id}`)}
                     className="hover:bg-gray-50 cursor-pointer"
                   >
-                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">{task.name}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+                      {task.name}
+                    </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={task.status} />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{formatOwners(task)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{task.timeToComplete} days</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{formatTags(task)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {formatOwners(task)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {task.timeToComplete} days
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {formatTags(task)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -288,7 +329,9 @@ export const TeamDetailPage = () => {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Add New Member</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Add New Member
+              </h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="text-gray-400 hover:text-gray-600 text-xl"
