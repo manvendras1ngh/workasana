@@ -29,10 +29,13 @@ export const addTeam = asyncWrapper(async (req, res) => {
   if (!name || !description)
     return res.status(400).json({ error: "Missing required fields" });
 
+  if (!members || !Array.isArray(members) || members.length === 0)
+    return res.status(400).json({ error: "At least one team member is required" });
+
   const newTeam = await Team.create({
     name,
     description,
-    members: members || [],
+    members,
   });
 
   const populatedTeam = await Team.findById(newTeam._id)
