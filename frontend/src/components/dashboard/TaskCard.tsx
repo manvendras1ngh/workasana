@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { Task, User } from "../../types";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 import {
   Avatar,
   AvatarFallback,

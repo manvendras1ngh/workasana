@@ -1,11 +1,22 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useTasks, useProjects, useTeams, useUsers, useTags } from "../../hooks/useQueries";
+import {
+  useTasks,
+  useProjects,
+  useTeams,
+  useUsers,
+  useTags,
+} from "../../hooks/useQueries";
 import { TaskCard } from "../dashboard/TaskCard";
 import { NewTaskModal } from "../dashboard/NewTaskModal";
 import type { TaskFilters, TaskStatus, Task } from "../../types";
 
-const statusOptions: TaskStatus[] = ["To Do", "In Progress", "Completed", "Blocked"];
+const statusOptions: TaskStatus[] = [
+  "To Do",
+  "In Progress",
+  "Completed",
+  "Blocked",
+];
 
 export const TaskList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,8 +38,8 @@ export const TaskList = () => {
   const { data: tags } = useTags();
   const { data: tasks, isLoading } = useTasks(
     Object.fromEntries(
-      Object.entries(filters).filter(([, v]) => v !== "" && v !== undefined)
-    ) as TaskFilters
+      Object.entries(filters).filter(([, v]) => v !== "" && v !== undefined),
+    ) as TaskFilters,
   );
 
   useEffect(() => {
@@ -81,7 +92,7 @@ export const TaskList = () => {
   }, [tasks, filters.sortBy, filters.sortOrder]);
 
   const hasActiveFilters = Object.entries(filters).some(
-    ([key, value]) => value && key !== "sortOrder"
+    ([key, value]) => value && key !== "sortOrder",
   );
 
   return (
@@ -208,7 +219,10 @@ export const TaskList = () => {
               <select
                 value={filters.sortBy || ""}
                 onChange={(e) =>
-                  updateFilter("sortBy", e.target.value as "dueDate" | "status" | "")
+                  updateFilter(
+                    "sortBy",
+                    e.target.value as "dueDate" | "status" | "",
+                  )
                 }
                 className="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
@@ -220,7 +234,7 @@ export const TaskList = () => {
                 onClick={() =>
                   updateFilter(
                     "sortOrder",
-                    filters.sortOrder === "asc" ? "desc" : "asc"
+                    filters.sortOrder === "asc" ? "desc" : "asc",
                   )
                 }
                 className="px-2 py-1.5 text-sm border border-gray-300 rounded-r hover:bg-gray-50"

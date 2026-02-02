@@ -29,7 +29,9 @@ export const TeamPage = () => {
             ))}
           </div>
         ) : (
-          <div className="text-gray-500">No teams found. Create your first team!</div>
+          <div className="text-gray-500">
+            No teams found. Create your first team!
+          </div>
         )}
       </section>
 

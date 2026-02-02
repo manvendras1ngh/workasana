@@ -1,6 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../../types";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/Card";
 
 interface ProjectCardProps {
   project: Project;
@@ -16,7 +21,9 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
     >
       <CardContent className="space-y-1">
         <CardTitle className="text-base">{project.name}</CardTitle>
-        <CardDescription className="line-clamp-2">{project.description}</CardDescription>
+        <CardDescription className="line-clamp-2">
+          {project.description}
+        </CardDescription>
       </CardContent>
     </Card>
   );

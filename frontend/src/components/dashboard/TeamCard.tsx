@@ -1,8 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import type { Team } from "../../types";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/Card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+} from "@/components/ui/avatar";
 
 interface TeamCardProps {
   team: Team;
@@ -40,7 +50,9 @@ export const TeamCard = ({ team }: TeamCardProps) => {
             Team
           </Badge>
           <CardTitle className="text-base mb-1">{team.name}</CardTitle>
-          <CardDescription className="line-clamp-2">{team.description}</CardDescription>
+          <CardDescription className="line-clamp-2">
+            {team.description}
+          </CardDescription>
         </div>
 
         <div className="flex items-center justify-between">
@@ -63,7 +75,9 @@ export const TeamCard = ({ team }: TeamCardProps) => {
           </div>
         </div>
 
-        <div className="text-xs text-muted-foreground">Created {formatDate(team.createdAt)}</div>
+        <div className="text-xs text-muted-foreground">
+          Created {formatDate(team.createdAt)}
+        </div>
       </CardContent>
     </Card>
   );

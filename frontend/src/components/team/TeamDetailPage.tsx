@@ -7,7 +7,7 @@ import {
   useTeamTasks,
   useTags,
 } from "../../hooks/useQueries";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import toast from "react-hot-toast";
 import type { User, Task } from "../../types";

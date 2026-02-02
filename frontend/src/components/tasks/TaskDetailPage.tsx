@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTask, useUpdateTaskStatus } from "../../hooks/useQueries";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/ui/Card";
 import toast from "react-hot-toast";
 import type { Project, Team, User } from "../../types";
 import { EditTaskModal } from "../dashboard/EditTaskModal";
