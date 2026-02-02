@@ -1,12 +1,12 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
-  useCreateTask,
+  useUpdateTask,
   useProjects,
   useTeams,
   useUsers,
   useTags,
 } from "../../hooks/useQueries";
-import type { TaskStatus } from "../../types";
+import type { TaskStatus, Task, Project, Team, User } from "../../types";
 import toast from "react-hot-toast";
 import axios from "axios";
 import {
@@ -20,9 +20,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
 
-interface NewTaskModalProps {
+interface EditTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
+  task: Task;
 }
 
 const statusOptions: TaskStatus[] = [
@@ -32,7 +33,11 @@ const statusOptions: TaskStatus[] = [
   "Blocked",
 ];
 
-export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
+export const EditTaskModal = ({
+  isOpen,
+  onClose,
+  task,
+}: EditTaskModalProps) => {
   const [name, setName] = useState("");
   const [projectId, setProjectId] = useState("");
   const [teamId, setTeamId] = useState("");
@@ -45,9 +50,34 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
   const { data: teams } = useTeams();
   const { data: users } = useUsers();
   const { data: tags } = useTags();
-  const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
 
-  // Filter owner options to only show members from selected team
+  // Populate form with existing task data
+  useEffect(() => {
+    if (task && isOpen) {
+      setName(task.name);
+
+      const projectData = task.project as Project;
+      setProjectId(
+        typeof projectData === "string" ? projectData : projectData._id,
+      );
+
+      const teamData = task.team as Team;
+      setTeamId(typeof teamData === "string" ? teamData : teamData._id);
+
+      const ownerData = task.owners as User[];
+      setOwnerIds(
+        ownerData.map((owner) =>
+          typeof owner === "string" ? owner : owner._id,
+        ),
+      );
+
+      setSelectedTags(task.tags || []);
+      setStatus(task.status);
+      setTimeToComplete(task.timeToComplete);
+    }
+  }, [task, isOpen]);
+
   const filteredOwnerOptions = useMemo(() => {
     if (!teamId || !teams || !users) return [];
 
@@ -64,20 +94,20 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
   }, [teamId, teams, users]);
 
   useEffect(() => {
-    if (teamId) {
-      setOwnerIds([]);
-    }
-  }, [teamId]);
+    if (!teamId || !teams || ownerIds.length === 0) return;
 
-  const resetForm = () => {
-    setName("");
-    setProjectId("");
-    setTeamId("");
-    setOwnerIds([]);
-    setSelectedTags([]);
-    setStatus("To Do");
-    setTimeToComplete(1);
-  };
+    const selectedTeam = teams.find((t) => t._id === teamId);
+    if (!selectedTeam) return;
+
+    const teamMemberIds = selectedTeam.members.map((m) =>
+      typeof m === "string" ? m : m._id,
+    );
+
+    const validOwners = ownerIds.filter((id) => teamMemberIds.includes(id));
+    if (validOwners.length !== ownerIds.length) {
+      setOwnerIds(validOwners);
+    }
+  }, [teamId, teams, ownerIds]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,27 +116,29 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
       return;
     }
 
-    createTask.mutate(
+    updateTask.mutate(
       {
-        name,
-        project: projectId,
-        team: teamId,
-        owners: ownerIds,
-        status,
-        timeToComplete,
-        tags: selectedTags,
+        taskId: task._id,
+        data: {
+          name,
+          project: projectId,
+          team: teamId,
+          owners: ownerIds,
+          status,
+          timeToComplete,
+          tags: selectedTags,
+        },
       },
       {
         onSuccess: () => {
-          toast.success("Task created!");
-          resetForm();
+          toast.success("Task updated successfully!");
           onClose();
         },
         onError: (error) => {
           if (axios.isAxiosError(error) && error.response?.data?.message) {
             toast.error(error.response.data.message);
           } else {
-            toast.error("Failed to create task");
+            toast.error("Failed to update task");
           }
         },
       },
@@ -119,7 +151,7 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>New Task</DialogTitle>
+          <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -222,8 +254,8 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={createTask.isPending}>
-              {createTask.isPending ? "Creating..." : "Create Task"}
+            <Button type="submit" disabled={updateTask.isPending}>
+              {updateTask.isPending ? "Updating..." : "Update Task"}
             </Button>
           </DialogFooter>
         </form>
