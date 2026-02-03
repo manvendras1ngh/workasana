@@ -23,6 +23,9 @@ export const userSignup = asyncWrapper(async (req, res) => {
   if (!name || !username || !email || !password)
     return res.status(400).json({ message: "Missing required fields" });
 
+  if (password.length < 6)
+    return res.status(400).json({ message: "Password must be at least 6 characters" });
+
   const userExists = await User.findOne({
     $or: [{ username }, { email }],
   }).lean();

@@ -42,6 +42,11 @@ const Signup = () => {
       return;
     }
 
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters!");
+      return;
+    }
+
     signupMutation.mutate({ name, username, email, password });
   };
 
@@ -102,6 +107,8 @@ const Signup = () => {
             id="password"
             ref={passRef}
             placeholder="******"
+            minLength={6}
+            required
             className="border border-zinc-400 px-3 rounded-lg w-full py-2"
           />
           <span className="text-xs text-zinc-500">
