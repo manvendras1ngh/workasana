@@ -12,26 +12,24 @@ import tagRoutes from "./routes/tag.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 
 //server config
-configDotenv({ path: "./.env" });
+configDotenv();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(express.json());
-app.use(cookieParser());
-
-//db connection
-instantiateConnection().catch((error) => {
-  console.error("Failed to connect to database:", error);
-});
-
-//server settings
 app.use(express.json({ limit: "16kb" }));
+app.use(cookieParser());
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true,
   }),
 );
+
+//db connection
+instantiateConnection().catch((error) => {
+  console.error("Failed to connect to database:", error);
+  process.exit(1);
+});
 
 //api's
 app.get("/", (req, res) => {
@@ -55,11 +53,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Only start server when not in serverless environment
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`Server running on port: http://localhost:${PORT}`);
-  });
-}
-
-export default app;
+app.listen(PORT, () => {
+  console.log(`Server running on port: http://localhost:${PORT}`);
+});
