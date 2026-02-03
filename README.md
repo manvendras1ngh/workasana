@@ -2,6 +2,8 @@
 
 A modern, full-stack project and task management application inspired by Asana. Workasana helps teams organize, track, and manage their work efficiently with an intuitive interface and powerful analytics.
 
+**Live Demo:** [workasana.netlify.app](https://workasana.netlify.app)
+
 ![Dashboard Preview](frontend/src/assets/dashboard-preview.png)
 
 ## Features
