@@ -14,9 +14,12 @@ interface MultiSelectProps {
   selected: string[]
   onChange: (selected: string[]) => void
   placeholder?: string
+  searchPlaceholder?: string
   label?: string
   id?: string
   className?: string
+  creatable?: boolean
+  onCreateOption?: (value: string) => void
 }
 
 export function MultiSelect({
@@ -24,11 +27,15 @@ export function MultiSelect({
   selected,
   onChange,
   placeholder = "Select items...",
+  searchPlaceholder = "Search...",
   label,
   id,
   className,
+  creatable,
+  onCreateOption,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false)
+  const [search, setSearch] = React.useState("")
   const containerRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
@@ -54,6 +61,24 @@ export function MultiSelect({
     }
   }
 
+  const handleCreate = () => {
+    const trimmed = search.trim()
+    if (trimmed && onCreateOption) {
+      onCreateOption(trimmed)
+      setSearch("")
+    }
+  }
+
+  const filteredOptions = search
+    ? options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase()))
+    : options
+
+  const showCreateOption =
+    creatable &&
+    onCreateOption &&
+    search.trim() &&
+    !options.some((opt) => opt.label.toLowerCase() === search.trim().toLowerCase())
+
   return (
     <div ref={containerRef} className={cn("relative", className)}>
       {label && (
@@ -75,7 +100,7 @@ export function MultiSelect({
             const option = options.find((opt) => opt.value === value)
             return (
               <Badge key={value} variant="secondary" className="gap-1">
-                {option?.label}
+                {option?.label ?? value}
                 <button
                   className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   onKeyDown={(e) => {
@@ -101,12 +126,21 @@ export function MultiSelect({
           <span className="text-muted-foreground text-sm">{placeholder}</span>
         )}
       </div>
-      {open && options.length > 0 && (
+      {open && (
         <div className="absolute z-50 w-full mt-1 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-          <Command className="max-h-64 overflow-auto">
+          <Command className="max-h-64 overflow-auto" shouldFilter={false}>
+            {(creatable || options.length > 5) && (
+              <input
+                className="flex h-9 w-full rounded-md bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground border-b"
+                placeholder={searchPlaceholder}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
             <CommandList>
               <CommandGroup>
-                {options.map((option) => {
+                {filteredOptions.map((option) => {
                   const isSelected = selected.includes(option.value)
                   return (
                     <CommandItem
@@ -136,6 +170,11 @@ export function MultiSelect({
                     </CommandItem>
                   )
                 })}
+                {showCreateOption && (
+                  <CommandItem onSelect={handleCreate} className="cursor-pointer">
+                    <span>Create "{search.trim()}"</span>
+                  </CommandItem>
+                )}
               </CommandGroup>
             </CommandList>
           </Command>
