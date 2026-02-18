@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   useUpdateTask,
+  useCreateTag,
   useProjects,
   useTeams,
   useUsers,
@@ -51,6 +52,7 @@ export const EditTaskModal = ({
   const { data: users } = useUsers();
   const { data: tags } = useTags();
   const updateTask = useUpdateTask();
+  const createTag = useCreateTag();
 
   // Populate form with existing task data
   useEffect(() => {
@@ -147,6 +149,18 @@ export const EditTaskModal = ({
 
   const tagOptions = tags?.map((t) => ({ value: t.name, label: t.name })) ?? [];
 
+  const handleCreateTag = (tagName: string) => {
+    createTag.mutate(tagName, {
+      onSuccess: () => {
+        setSelectedTags((prev) => [...prev, tagName]);
+        toast.success(`Tag "${tagName}" created`);
+      },
+      onError: () => {
+        toast.error("Failed to create tag");
+      },
+    });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -217,7 +231,10 @@ export const EditTaskModal = ({
             options={tagOptions}
             selected={selectedTags}
             onChange={setSelectedTags}
-            placeholder="Select tags (e.g., Urgent, Bug)"
+            onCreateOption={handleCreateTag}
+            placeholder="Select tags"
+            searchPlaceholder="Search or create tags..."
+            creatable
           />
 
           <div className="grid grid-cols-2 gap-4">

@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   useCreateTask,
+  useCreateTag,
   useProjects,
   useTeams,
   useUsers,
@@ -19,6 +20,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxValue,
+  useComboboxAnchor,
+} from "../ui/combobox";
 
 interface NewTaskModalProps {
   isOpen: boolean;
@@ -38,6 +50,7 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
   const [teamId, setTeamId] = useState("");
   const [ownerIds, setOwnerIds] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagInputValue, setTagInputValue] = useState("");
   const [status, setStatus] = useState<TaskStatus>("To Do");
   const [timeToComplete, setTimeToComplete] = useState(1);
 
@@ -46,6 +59,11 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
   const { data: users } = useUsers();
   const { data: tags } = useTags();
   const createTask = useCreateTask();
+  const createTag = useCreateTag();
+
+  const anchor = useComboboxAnchor();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const [tagPopupOpen, setTagPopupOpen] = useState(false);
 
   // Filter owner options to only show members from selected team
   const filteredOwnerOptions = useMemo(() => {
@@ -75,6 +93,8 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
     setTeamId("");
     setOwnerIds([]);
     setSelectedTags([]);
+    setTagInputValue("");
+    setTagPopupOpen(false);
     setStatus("To Do");
     setTimeToComplete(1);
   };
@@ -115,9 +135,20 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
 
   const tagOptions = tags?.map((t) => ({ value: t.name, label: t.name })) ?? [];
 
+  const handleCreateTag = (tagName: string) => {
+    createTag.mutate(tagName, {
+      onSuccess: () => {
+        setSelectedTags((prev) => [...prev, tagName]);
+        toast.success(`Tag "${tagName}" created`);
+      },
+      onError: () => {
+        toast.error("Failed to create tag");
+      },
+    });
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent ref={dialogRef} className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New Task</DialogTitle>
         </DialogHeader>
@@ -179,14 +210,71 @@ export const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps) => {
             />
           )}
 
-          <MultiSelect
-            id="task-tags"
-            label="Tags"
-            options={tagOptions}
-            selected={selectedTags}
-            onChange={setSelectedTags}
-            placeholder="Select tags (e.g., Urgent, Bug)"
-          />
+          <div className="space-y-2">
+            <Label>Tags</Label>
+            <Combobox
+              multiple
+              autoHighlight
+              items={tagOptions}
+              value={selectedTags}
+              open={tagPopupOpen}
+              onOpenChange={(open, eventDetails) => {
+                // In multiple mode, keep popup open after item selection
+                if (!open && eventDetails.reason === "item-press") return;
+                setTagPopupOpen(open);
+              }}
+              onValueChange={(values, eventDetails) => {
+                // Ignore programmatic resets (e.g. popup close reverting to initial value)
+                if (eventDetails.reason === "none") return;
+                setSelectedTags(values);
+              }}
+              inputValue={tagInputValue}
+              onInputValueChange={(value) => {
+                setTagInputValue(value);
+              }}
+            >
+              <ComboboxChips ref={anchor} className="w-full">
+                <ComboboxValue>
+                  {(tags) => (
+                    <>
+                      {Array.isArray(tags) &&
+                        tags.map((tag: string) => (
+                          <ComboboxChip key={tag}>
+                            {tag}
+                          </ComboboxChip>
+                        ))}
+                      <ComboboxChipsInput placeholder="Search or create tags..." />
+                    </>
+                  )}
+                </ComboboxValue>
+              </ComboboxChips>
+              <ComboboxContent anchor={anchor} container={dialogRef} className="cursor-pointer">
+                {tagInputValue &&
+                  !tagOptions.some(
+                    (t) =>
+                      t.value.toLowerCase() === tagInputValue.toLowerCase(),
+                  ) && (
+                    <div
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleCreateTag(tagInputValue.trim());
+                        setTagInputValue("");
+                      }}
+                      className="cursor-pointer p-2 hover:bg-accent text-sm"
+                    >
+                      Create tag "{tagInputValue.trim()}"
+                    </div>
+                  )}
+                <ComboboxList>
+                  {(tag) => (
+                    <ComboboxItem key={tag.value} value={tag.value}>
+                      {tag.label}
+                    </ComboboxItem>
+                  )}
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

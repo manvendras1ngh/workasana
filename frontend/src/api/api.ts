@@ -162,6 +162,11 @@ export const tagApi = {
     const res = await api.get("/tags");
     return res.data.data;
   },
+
+  create: async (name: string): Promise<Tag> => {
+    const res = await api.post("/tags", { tagName: name });
+    return res.data.data;
+  },
 };
 
 export const reportApi = {

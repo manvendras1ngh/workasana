@@ -15,7 +15,8 @@ export const addTag = asyncWrapper(async (req, res) => {
   if (!tagName)
     return res.status(400).json({ error: "Missing required field" });
 
-  const tagExists = await Tag.find({ name: tagName }).lean();
+  const tags = await Tag.find({ name: tagName }).lean();
+  const tagExists = tags.find((t) => t.name === tagName);
 
   if (tagExists) return res.status(400).json({ error: "Tag already exists" });
 

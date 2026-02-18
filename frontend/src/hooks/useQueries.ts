@@ -171,6 +171,16 @@ export const useTags = () => {
   });
 };
 
+export const useCreateTag = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => tagApi.create(name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+    },
+  });
+};
+
 export const useLastWeekReport = () => {
   return useQuery({
     queryKey: ["reports", "last-week"],
