@@ -121,3 +121,77 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===== Landing page ===== */
+
+.font-syne {
+  font-family: "Syne", sans-serif;
+}
+
+.font-outfit {
+  font-family: "Outfit", sans-serif;
+}
+
+.landing-gradient-text {
+  background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Entry animation */
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-fade-up {
+  animation: landing-fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Pulsing glow behind dashboard preview */
+@keyframes landing-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.04);
+  }
+}
+
+.landing-glow-pulse {
+  animation: landing-glow-pulse 5s ease-in-out infinite;
+}
+
+/* Subtle grid background */
+.landing-grid-bg {
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.022) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Scroll-triggered reveal */
+.landing-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

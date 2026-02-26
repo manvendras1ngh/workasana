@@ -14,12 +14,20 @@ import { ProjectsPage } from "./components/projects/ProjectsPage";
 import { ProjectDetailPage } from "./components/projects/ProjectDetailPage";
 import { ReportsPage } from "./components/reports/ReportsPage";
 import { SettingsPage } from "./components/settings/SettingsPage";
+import { LandingPage } from "./components/landing/LandingPage";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          }
+        />
         <Route
           path="/login"
           element={
@@ -53,7 +61,7 @@ function App() {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
-        <Route path="/home" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/home" element={<Navigate to="/" replace />} />
       </Routes>
       <Toaster />
     </>
