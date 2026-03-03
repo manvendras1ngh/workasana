@@ -5,7 +5,7 @@ import {
   CardContent,
   CardDescription,
   CardTitle,
-} from "@/components/ui/Card";
+} from "@/components/ui/card";
 
 interface ProjectCardProps {
   project: Project;
