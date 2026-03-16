@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { authApi } from "../../api/api";
 import {
   ArrowRight,
   BarChart3,
@@ -69,7 +71,7 @@ function useScrollReveal() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" },
     );
 
     const targets = el.querySelectorAll(".landing-reveal");
@@ -85,6 +87,16 @@ export function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const revealRef = useScrollReveal();
+  const queryClient = useQueryClient();
+
+  // Prewarm the Render backend + populate auth cache so login/signup pages load instantly
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["user", "auth"],
+      queryFn: authApi.me,
+      staleTime: 1000 * 60 * 5,
+    });
+  }, [queryClient]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
