@@ -14,7 +14,7 @@ import {
   usePendingWorkReport,
   useClosedTasksReport,
 } from "../../hooks/useQueries";
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui/card";
 
 ChartJS.register(
   CategoryScale,

@@ -5,7 +5,7 @@ import {
   CardContent,
   CardDescription,
   CardTitle,
-} from "@/components/ui/Card";
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Avatar,
